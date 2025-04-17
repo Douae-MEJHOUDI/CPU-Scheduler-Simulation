@@ -54,7 +54,7 @@ class PriorityScheduler(BaseScheduler):
         process.execute(time_slice)
         
          
-        self.schedule.append((process.pid, time_slice))
+        self.schedule_result.append((process.pid, time_slice))
         
          
         self.current_time += time_slice

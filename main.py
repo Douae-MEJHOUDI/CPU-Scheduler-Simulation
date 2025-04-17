@@ -49,6 +49,12 @@ def parse_arguments():
 
 def run_simulation(algorithm, processes, quantum=2):
     """Run the selected scheduling algorithm."""
+    import copy
+
+    process_copies = copy.deepcopy(processes)
+    for process in process_copies:
+        process.reset()
+
     schedulers = {
         "fcfs": FCFSScheduler(),
         "sjf": SJFScheduler(),
@@ -59,8 +65,8 @@ def run_simulation(algorithm, processes, quantum=2):
     
     if algorithm in schedulers:
         scheduler = schedulers[algorithm]
-        schedule = scheduler.schedule(processes)
-        metrics = calculate_metrics(schedule, processes)
+        schedule = scheduler.schedule(process_copies)
+        metrics = calculate_metrics(schedule, process_copies)
         return schedule, metrics
     else:
         raise ValueError(f"Unknown algorithm: {algorithm}")
@@ -79,7 +85,6 @@ def run_all_simulations(processes, quantum=2):
         }
     
     return results
-
 
 def main():
     """Main function to run the CPU scheduler simulation."""

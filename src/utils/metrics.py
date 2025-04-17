@@ -52,7 +52,7 @@ def calculate_cpu_utilization(schedule, total_time):
     Returns:
         float: CPU utilization percentage.
     """
-    busy_time = sum(time_slice for _, time_slice in schedule if _ != -1)
+    busy_time = sum(time_slice for pid, time_slice in schedule if pid != -1)
     return (busy_time / total_time) * 100 if total_time > 0 else 0
 
 

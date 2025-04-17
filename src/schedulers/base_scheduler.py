@@ -20,7 +20,7 @@ class BaseScheduler(ABC):
     def __init__(self):
         """Initialize the scheduler."""
         self.current_time = 0
-        self.schedule = []
+        self.schedule_result = []
     
     @abstractmethod
     def get_next_process(self, ready_queue):
@@ -50,7 +50,7 @@ class BaseScheduler(ABC):
         
          
         self.current_time = 0
-        self.schedule = []
+        self.schedule_result = []
         
          
         ready_queue = []
@@ -82,7 +82,7 @@ class BaseScheduler(ABC):
                 
                  
                 idle_time = next_arrival - self.current_time
-                self.schedule.append((-1, idle_time))
+                self.schedule_result.append((-1, idle_time))
                 self.current_time = next_arrival
                 continue
             
@@ -115,7 +115,7 @@ class BaseScheduler(ABC):
                 if next_process in ready_queue:
                     ready_queue.remove(next_process)
         
-        return self.schedule
+        return self.schedule_result
     
     @abstractmethod
     def execute_process(self, process, ready_queue):
