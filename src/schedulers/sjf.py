@@ -1,24 +1,25 @@
 """
-First-Come, First-Served (FCFS) Scheduler Module
-This module implements the FCFS CPU scheduling algorithm.
+Shortest Job First (SJF) Scheduler Module
+This module implements the SJF CPU scheduling algorithm.
 """
 
 from src.schedulers.base_scheduler import BaseScheduler
 
 
-class FCFSScheduler(BaseScheduler):
+class SJFScheduler(BaseScheduler):
     """
-    First-Come, First-Served (FCFS) Scheduler
+    Shortest Job First (SJF) Scheduler
     
-    This scheduler executes processes in the order they arrive. It is a non-preemptive
-    scheduler, meaning once a process starts executing, it runs until completion.
+    This scheduler executes the process with the shortest burst time first. It is a
+    non-preemptive scheduler, meaning once a process starts executing, it runs until
+    completion.
     """
     
     def get_next_process(self, ready_queue):
         """
-        Get the next process to execute according to FCFS.
+        Get the next process to execute according to SJF.
         
-        In FCFS, the next process is the one that arrived first.
+        In SJF, the next process is the one with the shortest burst time.
         
         Args:
             ready_queue (list): List of processes that are ready to execute.
@@ -30,14 +31,14 @@ class FCFSScheduler(BaseScheduler):
             return None
         
          
-        ready_queue.sort(key=lambda p: p.arrival_time)
+        ready_queue.sort(key=lambda p: p.remaining_time)
         return ready_queue[0]
     
     def execute_process(self, process, ready_queue):
         """
-        Execute the given process according to FCFS.
+        Execute the given process according to SJF.
         
-        In FCFS, the process runs until completion.
+        In SJF, the process runs until completion.
         
         Args:
             process (Process): The process to execute.
@@ -59,7 +60,7 @@ class FCFSScheduler(BaseScheduler):
     
     def schedule(self, processes):
         """
-        Schedule the given processes according to FCFS.
+        Schedule the given processes according to SJF.
         
         Args:
             processes (list): List of Process objects to schedule.
