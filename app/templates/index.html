@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}CPU Scheduler Simulation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">
+                    <i class="fas fa-cogs mr-2"></i>CPU Scheduler Simulation
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="lead">
+                    This application simulates various CPU scheduling algorithms to help understand their behavior and performance characteristics.
+                </p>
+                <p>
+                    You can configure simulation parameters below, generate random processes, or upload your own process data file.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Simulation Form -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-sliders-h mr-2"></i>Simulation Parameters
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        {{ form.algorithm.label(class="form-control-label") }}
+                        {{ form.algorithm(class="form-control") }}
+                        {% if form.algorithm.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.algorithm.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{ form.process_count.label(class="form-control-label") }}
+                            {{ form.process_count(class="form-control") }}
+                            {% if form.process_count.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.process_count.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ form.quantum.label(class="form-control-label") }}
+                            {{ form.quantum(class="form-control") }}
+                            {% if form.quantum.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.quantum.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{ form.min_burst.label(class="form-control-label") }}
+                            {{ form.min_burst(class="form-control") }}
+                            {% if form.min_burst.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.min_burst.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ form.max_burst.label(class="form-control-label") }}
+                            {{ form.max_burst(class="form-control") }}
+                            {% if form.max_burst.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.max_burst.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{ form.min_arrival.label(class="form-control-label") }}
+                            {{ form.min_arrival(class="form-control") }}
+                            {% if form.min_arrival.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.min_arrival.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ form.max_arrival.label(class="form-control-label") }}
+                            {{ form.max_arrival(class="form-control") }}
+                            {% if form.max_arrival.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.max_arrival.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{ form.min_priority.label(class="form-control-label") }}
+                            {{ form.min_priority(class="form-control") }}
+                            {% if form.min_priority.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.min_priority.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ form.max_priority.label(class="form-control-label") }}
+                            {{ form.max_priority(class="form-control") }}
+                            {% if form.max_priority.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.max_priority.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.process_file.label(class="form-control-label") }}
+                        {{ form.process_file(class="form-control-file") }}
+                        {% if form.process_file.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.process_file.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Upload a CSV or JSON file with process data. Format: pid, arrival_time, burst_time, priority
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary btn-block") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Process Table -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-list mr-2"></i>Process List
+                </h4>
+                {% if processes %}
+                <form action="{{ url_for('main.clear_processes') }}" method="POST" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash mr-1"></i>Clear
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if processes %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>PID</th>
+                                <th>Arrival Time</th>
+                                <th>Burst Time</th>
+                                <th>Priority</th>
+                                {% if processes[0].start_time is not none %}
+                                <th>Waiting Time</th>
+                                <th>Turnaround Time</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for process in processes %}
+                            <tr>
+                                <td>{{ process.pid }}</td>
+                                <td>{{ process.arrival_time }}</td>
+                                <td>{{ process.burst_time }}</td>
+                                <td>{{ process.priority }}</td>
+                                {% if process.start_time is not none %}
+                                <td>{{ process.waiting_time }}</td>
+                                <td>{{ process.turnaround_time }}</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i>No processes available. Generate new processes or upload a file.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Algorithm Info Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-info-circle mr-2"></i>Algorithm Information
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="algorithmAccordion">
+                    <div class="card">
+                        <div class="card-header" id="headingFCFS">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseFCFS">
+                                    First-Come, First-Served (FCFS)
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapseFCFS" class="collapse" data-parent="#algorithmAccordion">
+                            <div class="card-body">
+                                <p>Processes are executed in the order they arrive in the ready queue. This is a non-preemptive algorithm.</p>
+                                <p><strong>Pros:</strong> Simple to implement, fair for long processes</p>
+                                <p><strong>Cons:</strong> Short processes might have to wait behind long ones (convoy effect), leading to high average waiting time</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" id="headingSJF">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseSJF">
+                                    Shortest Job First (SJF)
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapseSJF" class="collapse" data-parent="#algorithmAccordion">
+                            <div class="card-body">
+                                <p>Selects the process with the smallest burst time to execute next. This is a non-preemptive algorithm.</p>
+                                <p><strong>Pros:</strong> Optimal average waiting time, good for batch systems</p>
+                                <p><strong>Cons:</strong> Long processes may starve, requires knowledge of burst time in advance</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" id="headingPriority">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapsePriority">
+                                    Priority Scheduling
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapsePriority" class="collapse" data-parent="#algorithmAccordion">
+                            <div class="card-body">
+                                <p>Processes are scheduled based on priority. Higher priority processes (lower priority number) are executed first. This implementation is non-preemptive.</p>
+                                <p><strong>Pros:</strong> Important processes get CPU first</p>
+                                <p><strong>Cons:</strong> Lower priority processes may starve, priority inversion possible</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" id="headingRR">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseRR">
+                                    Round Robin (RR)
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapseRR" class="collapse" data-parent="#algorithmAccordion">
+                            <div class="card-body">
+                                <p>Each process is assigned a fixed time slice (quantum) in a cyclic way. This is a preemptive algorithm.</p>
+                                <p><strong>Pros:</strong> Fair allocation of CPU, good for time-sharing systems, responsive</p>
+                                <p><strong>Cons:</strong> Higher average turnaround time, performance depends on quantum size</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header" id="headingPriorityRR">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapsePriorityRR">
+                                    Priority + Round Robin
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapsePriorityRR" class="collapse" data-parent="#algorithmAccordion">
+                            <div class="card-body">
+                                <p>Processes are grouped by priority, and within each priority level, Round Robin scheduling is applied.</p>
+                                <p><strong>Pros:</strong> Combines benefits of priority scheduling and round robin</p>
+                                <p><strong>Cons:</strong> Complex implementation, may still have priority inversion issues</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

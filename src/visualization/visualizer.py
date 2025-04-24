@@ -4,6 +4,8 @@ This module provides functions to visualize CPU scheduling results.
 """
 
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Patch

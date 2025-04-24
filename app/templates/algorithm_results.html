@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}{{ algorithm|upper }} Results - CPU Scheduler Simulation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-chart-bar mr-2"></i>{{ algorithm|upper }} Scheduler Results
+                </h3>
+                <a href="{{ url_for('main.index') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left mr-1"></i>Back to Simulation
+                </a>
+            </div>
+            <div class="card-body">
+                <p class="lead">
+                    Simulation results for {{ algorithm|upper }} scheduling algorithm.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Metrics Card -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Performance Metrics
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">Average Turnaround Time</h5>
+                            <span class="badge badge-primary badge-pill">{{ metrics.avg_turnaround_time|round(2) }}</span>
+                        </div>
+                        <small class="text-muted">Time from arrival to completion</small>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">Average Waiting Time</h5>
+                            <span class="badge badge-info badge-pill">{{ metrics.avg_waiting_time|round(2) }}</span>
+                        </div>
+                        <small class="text-muted">Time spent in ready queue</small>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">CPU Utilization</h5>
+                            <span class="badge badge-success badge-pill">{{ metrics.cpu_utilization|round(2) }}%</span>
+                        </div>
+                        <small class="text-muted">Percentage of time CPU was busy</small>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">Total Time</h5>
+                            <span class="badge badge-secondary badge-pill">{{ metrics.total_time }}</span>
+                        </div>
+                        <small class="text-muted">Total simulation time units</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Table -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-list-ol mr-2"></i>Execution Order
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Process ID</th>
+                                <th>Time Slice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pid, time_slice in schedule %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{% if pid == -1 %}Idle{% else %}P{{ pid }}{% endif %}</td>
+                                <td>{{ time_slice }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gantt Chart -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-chart-gantt mr-2"></i>Gantt Chart
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename=gantt_image) }}" class="img-fluid" alt="{{ algorithm }} Gantt Chart">
+            </div>
+        </div>
+
+        <!-- Process Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-microchip mr-2"></i>Process Details
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>PID</th>
+                                <th>Arrival</th>
+                                <th>Burst</th>
+                                <th>Priority</th>
+                                <th>Start</th>
+                                <th>Finish</th>
+                                <th>Waiting</th>
+                                <th>Turnaround</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for process in processes %}
+                            <tr>
+                                <td>{{ process.pid }}</td>
+                                <td>{{ process.arrival_time }}</td>
+                                <td>{{ process.burst_time }}</td>
+                                <td>{{ process.priority }}</td>
+                                <td>{{ process.start_time }}</td>
+                                <td>{{ process.finish_time }}</td>
+                                <td>{{ process.waiting_time }}</td>
+                                <td>{{ process.turnaround_time }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Highlight rows when hovering over schedule entries
+    $(document).ready(function() {
+        $('table tbody tr').hover(
+            function() {
+                const pid = $(this).find('td:nth-child(2)').text();
+                if (pid !== 'Idle') {
+                    // Remove 'P' prefix to get just the number
+                    const processId = pid.replace('P', '');
+                    $(`table tbody tr td:first-child:contains(${processId})`).parent().addClass('table-primary');
+                }
+            },
+            function() {
+                $('table tbody tr').removeClass('table-primary');
+            }
+        );
+    });
+</script>
+{% endblock %}

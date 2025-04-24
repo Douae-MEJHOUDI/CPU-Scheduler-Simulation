@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Algorithm Comparison - CPU Scheduler Simulation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-chart-line mr-2"></i>Scheduling Algorithm Comparison
+                </h3>
+                <a href="{{ url_for('main.index') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left mr-1"></i>Back to Simulation
+                </a>
+            </div>
+            <div class="card-body">
+                <p class="lead">
+                    Comparison of performance metrics across different CPU scheduling algorithms.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Charts -->
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-chart-bar mr-2"></i>Performance Comparison
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename=comparison_image) }}" class="img-fluid" alt="Scheduler Comparison">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Timeline Comparison -->
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-stream mr-2"></i>Timeline Comparison
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename=timeline_image) }}" class="img-fluid" alt="Timeline Comparison">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Comparison Table -->
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-table mr-2"></i>Metrics Comparison
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Avg. Turnaround Time</th>
+                                <th>Avg. Waiting Time</th>
+                                <th>CPU Utilization</th>
+                                <th>Total Time</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for algorithm in algorithms %}
+                            <tr>
+                                <td>{{ algorithm|upper }}</td>
+                                <td>{{ metrics[algorithm].avg_turnaround_time|round(2) }}</td>
+                                <td>{{ metrics[algorithm].avg_waiting_time|round(2) }}</td>
+                                <td>{{ metrics[algorithm].cpu_utilization|round(2) }}%</td>
+                                <td>{{ metrics[algorithm].total_time }}</td>
+                                <td>
+                                    {% if algorithm == 'fcfs' %}
+                                        Simplicity, fairness to long processes
+                                    {% elif algorithm == 'sjf' %}
+                                        Minimizing average waiting time
+                                    {% elif algorithm == 'priority' %}
+                                        Systems where process importance varies
+                                    {% elif algorithm == 'rr' %}
+                                        Time-sharing systems, fairness
+                                    {% elif algorithm == 'priority_rr' %}
+                                        Interactive systems with varied process importance
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Analysis Card -->
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-lightbulb mr-2"></i>Analysis & Insights
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5 class="alert-heading">Best Algorithm for This Workload</h5>
+                    
+                    <p>Based on the metrics:</p>
+                    <ul>
+                        <li><strong>For minimal waiting time:</strong> {{ best_algo_waiting|upper }} with {{ metrics[best_algo_waiting].avg_waiting_time|round(2) }} average waiting time</li>
+                        <li><strong>For highest CPU utilization:</strong> {{ best_algo_utilization|upper }} with {{ metrics[best_algo_utilization].cpu_utilization|round(2) }}% utilization</li>
+                    </ul>
+                </div>
+                
+                <h5>Key Observations:</h5>
+                <ul>
+                    <li>SJF typically provides the shortest average waiting time but can lead to starvation of long processes.</li>
+                    <li>FCFS is simple but can lead to convoy effect where short processes wait behind long ones.</li>
+                    <li>Round Robin provides better response time but may increase context switching overhead.</li>
+                    <li>Priority scheduling is good for systems where process importance varies but needs mechanism to prevent starvation.</li>
+                </ul>
+                
+                <h5>When to Choose Each Algorithm:</h5>
+                <ul>
+                    <li><strong>FCFS:</strong> When simplicity is important and processes have similar burst times</li>
+                    <li><strong>SJF:</strong> When minimizing average waiting time is critical and burst times are known</li>
+                    <li><strong>Priority:</strong> When certain processes need preferential treatment</li>
+                    <li><strong>Round Robin:</strong> For time-sharing systems where response time is important</li>
+                    <li><strong>Priority + RR:</strong> For systems requiring both prioritization and fair CPU sharing</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
