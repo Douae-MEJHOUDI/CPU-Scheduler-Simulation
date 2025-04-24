@@ -87,7 +87,7 @@ Or specify parameters:
 
 ```bash
 python src/main.py --algorithm fcfs --processes 10 --min_burst 1 --max_burst 10 --min_arrival 0 --max_arrival 20 --quantum 2
-
+```
 #### Command Line Arguments
 
 - `--algorithm`, `-a`: Scheduling algorithm to use (fcfs, sjf, priority, rr, priority_rr, all)
