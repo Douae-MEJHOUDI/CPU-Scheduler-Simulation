@@ -140,7 +140,7 @@ cpu_scheduler_simulation/
 ├── output/                   # Output directory for visualizations
 ├── run.py                    # Enhanced Flask application runner 
 ├── main.py                   # Command-line interface entry point
-├── requirements.txt          # Python dependencies
+├── requirements.yml          # Python dependencies
 └── README.md                 # This file
 ```
 
