@@ -32,7 +32,7 @@ This project provides a comprehensive simulation of CPU scheduling algorithms wi
 - Flask and Flask extensions
 - Matplotlib
 - NumPy
-- Other dependencies listed in `requirements.txt`
+- Other dependencies listed in `requirements.yml`
 
 ## Installation
 
@@ -42,15 +42,14 @@ This project provides a comprehensive simulation of CPU scheduling algorithms wi
    cd cpu-scheduler-simulation
    ```
 
-2. Create and activate a virtual environment (recommended):
+2. Create a virtual environment for the required dependencies:
    ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   conda env create -f requirements.yml
    ```
 
-3. Install the required dependencies:
+3. activate the virtual environment :
    ```
-   pip install -r requirements.txt
+   conda activate schedule
    ```
 
 ## Usage
