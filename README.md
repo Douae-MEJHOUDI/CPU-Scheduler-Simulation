@@ -99,7 +99,7 @@ python main.py --algorithm fcfs --processes 10 --min_burst 1 --max_burst 10 --mi
 - `--max_priority`, `-xp`: Maximum priority (higher number is lower priority)
 - `--quantum`, `-q`: Time quantum for Round Robin
 - `--input_file`, `-i`: Input file with process data
-- `--output_dir`, `-o`: Directory to save visualizations
+- `--output_dir`, `-o`: Directory to save visualizations (By default the directory is created and named output in which we store the plots)
 
 #### Input File Format
 
