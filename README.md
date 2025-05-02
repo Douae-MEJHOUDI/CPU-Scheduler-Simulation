@@ -59,7 +59,7 @@ This project provides a comprehensive simulation of CPU scheduling algorithms wi
 
 1. Start the Flask application:
    ```
-   python run.py
+   python run.py --debug
    ```
 
 2. Open a web browser and navigate to:
