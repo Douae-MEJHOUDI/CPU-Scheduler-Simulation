@@ -1,8 +1,3 @@
-"""
-Round Robin (RR) Scheduler Module
-This module implements the Round Robin CPU scheduling algorithm.
-"""
-
 from src.schedulers.base_scheduler import BaseScheduler
 from collections import deque
 
@@ -25,7 +20,8 @@ class RoundRobinScheduler(BaseScheduler):
         """
         super().__init__()
         self.quantum = quantum
-        self.ready_queue = deque()
+        self.ready_queue = []  
+        self.process_index = 0 
     
     def get_next_process(self, ready_queue):
         """
@@ -39,14 +35,27 @@ class RoundRobinScheduler(BaseScheduler):
         Returns:
             Process or None: The next process to execute, or None if no process is ready.
         """
-        if not self.ready_queue and ready_queue:
-             
-            self.ready_queue = deque(sorted(ready_queue, key=lambda p: p.arrival_time))
+
+        while (self.process_index < len(ready_queue) and 
+               ready_queue[self.process_index].arrival_time <= self.current_time):
+            process = ready_queue[self.process_index]
+            self.ready_queue.append((process, process.remaining_time))
+            self.process_index += 1
         
         if not self.ready_queue:
-            return None
-        
-        return self.ready_queue.popleft()
+            if self.process_index < len(ready_queue):
+                next_process = ready_queue[self.process_index]
+                idle_time = next_process.arrival_time - self.current_time
+
+                self.schedule_result.append((-1, idle_time))
+                self.current_time += idle_time
+
+                return self.get_next_process(ready_queue)
+            else:
+                return None
+
+        process, remaining_time = self.ready_queue.pop(0)
+        return process
     
     def execute_process(self, process, ready_queue):
         """
@@ -58,34 +67,25 @@ class RoundRobinScheduler(BaseScheduler):
             process (Process): The process to execute.
             ready_queue (list): The list of processes in the ready queue.
         """
-         
         if process.start_time is None:
             process.start(self.current_time)
-        
-         
+
         time_slice = min(self.quantum, process.remaining_time)
         process.execute(time_slice)
-        
-         
+
         self.schedule_result.append((process.pid, time_slice))
-        
-         
+
         self.current_time += time_slice
-        
-         
+
+        while (self.process_index < len(ready_queue) and 
+               ready_queue[self.process_index].arrival_time <= self.current_time):
+            new_process = ready_queue[self.process_index]
+            self.ready_queue.append((new_process, new_process.remaining_time))
+            self.process_index += 1
+
         if not process.is_completed():
-             
-            for p in ready_queue:
-                if (p.arrival_time <= self.current_time and
-                        p not in self.ready_queue and
-                        not p.is_completed() and
-                        p != process):
-                    self.ready_queue.append(p)
-            
-             
-            self.ready_queue.append(process)
+            self.ready_queue.append((process, process.remaining_time))
         else:
-             
             process.complete(self.current_time)
     
     def schedule(self, processes):
@@ -98,6 +98,18 @@ class RoundRobinScheduler(BaseScheduler):
         Returns:
             list: The schedule as a list of (pid, time_slice) tuples.
         """
-         
-        self.ready_queue = deque()
-        return self.schedule_processes(processes)
+        processes.sort(key=lambda p: p.arrival_time)
+
+        self.current_time = 0
+        self.schedule_result = []
+        self.ready_queue = []
+        self.process_index = 0
+
+        while self.process_index < len(processes) or self.ready_queue:
+            process = self.get_next_process(processes)
+            if process is None:
+                break
+            
+            self.execute_process(process, processes)
+        
+        return self.schedule_result
