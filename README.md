@@ -71,6 +71,8 @@ This project provides a comprehensive simulation of CPU scheduling algorithms wi
    - Generate random processes or upload a file (a file example is given in data folder)
    - Run the simulation
    - View and analyze the results
+  
+*The output of the simulations are securely saved in the app/static/output folder for further improvements of features (simulation report download feature)*
 
 ### Command-Line Interface
 
@@ -112,6 +114,10 @@ pid,arrival_time,burst_time,priority
 3,4,1,3
 4,6,4,2
 5,8,2,1
+```
+A sample file is provided in the data folder to use it : 
+```
+python main.py -a all -i data/sample_processes.csv
 ```
 
 ## Project Structure
